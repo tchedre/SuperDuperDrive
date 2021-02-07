@@ -14,14 +14,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 @Controller
 @RequestMapping("/files")
-public class FileController {
+public class FileController implements HandlerExceptionResolver {
 
     private FileService fileService;
 
@@ -57,6 +62,11 @@ public class FileController {
             model.addAttribute("message", "File to upload is empty");
             return "result";
         }
+        if (fileService.isFileExist(fileUpload.getOriginalFilename())) {
+            model.addAttribute("result", "error");
+            model.addAttribute("message", fileUpload.getOriginalFilename() + " already exists");
+            return "result";
+        }
         if (fileService.addFile(fileUpload, authentication.getName())) {
             model.addAttribute("result", "success");
             return "result";
@@ -77,5 +87,15 @@ public class FileController {
         model.addAttribute("result", "error");
         model.addAttribute("message", "Error occurred when deleting your file");
         return "result";
+    }
+
+    @Override
+    public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
+        ModelAndView modelAndView = new ModelAndView("result");
+        if (e instanceof MaxUploadSizeExceededException) {
+            modelAndView.getModel().put("result", "error");
+            modelAndView.getModel().put("message", "File size exceeds limit!");
+        }
+        return modelAndView;
     }
 }

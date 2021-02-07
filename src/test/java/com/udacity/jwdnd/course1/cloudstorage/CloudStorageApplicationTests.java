@@ -92,7 +92,7 @@ class CloudStorageApplicationTests {
 		signUpAndLogin();
 		//logout
 		WebElement logoutButton = driver.findElement(By.id("logout"));
-		logoutButton.click();
+		logoutButton.submit();
 		wait.until(ExpectedConditions.elementToBeClickable(By.id("login")));
 		Assertions.assertEquals("Login", driver.getTitle());
 

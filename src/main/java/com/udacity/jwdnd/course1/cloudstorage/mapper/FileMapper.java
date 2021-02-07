@@ -14,6 +14,9 @@ public interface FileMapper {
     @Select("SELECT * FROM FILES WHERE fileid = #{fileId}")
     public File findOne(int fileId);
 
+    @Select("SELECT EXISTS(SELECT 1 FROM FILES WHERE filename = #{fileName})")
+    public boolean checkFileExists(String fileName);
+
     @Select("SELECT * FROM FILES WHERE fileid = #{fileId} and userid = #{userId}")
     public File findByFileIdAndUserId(int fileId, int userId);
 

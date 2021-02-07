@@ -47,4 +47,8 @@ public class FileService {
         }
         return false;
     }
+
+    public boolean isFileExist (String fileName) {
+        return fileMapper.checkFileExists(fileName);
+    }
 }

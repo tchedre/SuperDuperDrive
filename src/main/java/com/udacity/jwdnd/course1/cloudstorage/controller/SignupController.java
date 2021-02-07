@@ -26,26 +26,19 @@ public class SignupController {
 
     @PostMapping()
     public String signupUser(@ModelAttribute UserDto userDto, Model model) {
-        String signupError = null;
 
         if (!userService.isUsernameAvailable(userDto.getUsername())) {
-            signupError = "The username already exists.";
+            model.addAttribute("signupError", "The username already exists.");
+            return "signup";
         }
 
-        if (signupError == null) {
-            int rowsAdded = userService.createUser(userDto);
-            if (rowsAdded < 0) {
-                signupError = "There was an error signing you up. Please try again.";
-            }
+        if (userService.createUser(userDto) < 0) {
+            model.addAttribute("signupError","There was an error signing you up. Please try again.");
+            return "signup";
         }
 
-        if (signupError == null) {
-            model.addAttribute("signupSuccess", true);
-        } else {
-            model.addAttribute("signupError", signupError);
-        }
-
-        return "signup";
+        model.addAttribute("signupSuccess", true);
+        return "login";
     }
 
 }
